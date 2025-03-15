@@ -1,6 +1,7 @@
 ﻿using HospitalManagement.DataAccess;
 using HospitalManagement.Repository;
 using HospitalManagement.Repository.Interfaces;
+using HospitalManagement.Services;
 using HospitalManagement.Services.Doctors;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,14 +13,8 @@ public static class DependencyInjection
     {
         services.AddScoped<IDoctorRepository, DoctorRepository>();
         services.AddScoped<IDoctorService, DoctorService>();
-
-        services.AddDbContext<HospitalContext>(options =>
-        {
-            options
-                .UseNpgsql("Server=localhost;Port=5432;Database=hospital_management;User Id=postgres;Password=postgres;")
-                .UseSnakeCaseNamingConvention();
-        });
-
+        services.AddSingleton<PdpService>();
+    
         return services;
     }
 }
