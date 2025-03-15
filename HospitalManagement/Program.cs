@@ -4,6 +4,7 @@ using HospitalManagement.Extensions;
 using HospitalManagement.Middlewares;
 using HospitalManagement.Settings;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +15,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDependencies();
 
 var configuration = builder.Configuration;
-
-//var connectionStringPath = configuration["ConnectionStrings:DefaultConnection"];
-//var mainConnectionString = configuration["HospitalManagement:ConnectionString:Main"];
 
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<HospitalContext>(options =>
@@ -29,26 +27,13 @@ builder.Services.AddDbContext<HospitalContext>(options =>
 
 builder.Services.AddHttpClient();
 
-//var pdpSettings = configuration.GetSection("PdpSettings");
-//var endpoint = pdpSettings.GetSection("Endpoint").Value;
-//var children = pdpSettings.GetChildren();
-
-//var pdpSettingsEndpoint = configuration.GetSection("PdpSettings:Endpoint");
-
-//builder.Services.AddHttpClient<CreateDoctorDto>(options =>
-//{
-//    options.BaseAddress = new Uri(endpoint);
-//});
-
 builder.Services.Configure<PdpSettings>(configuration.GetSection("PdpSettings"));
 builder.Services.Configure<DoctorsSettings>(configuration.GetSection("DoctorsSettings"));
 
-//builder.Services.AddOptions<PdpSettings>("PdpSettings")
-//    .Configure(options =>
-//    {
-//        options.
-//    });
-
+builder.Services.AddSerilog((serviceProvider, loggerConfiguration) =>
+{
+    loggerConfiguration.ReadFrom.Configuration(configuration);
+});
 
 var app = builder.Build();
 
