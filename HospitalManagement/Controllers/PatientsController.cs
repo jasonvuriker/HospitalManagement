@@ -3,6 +3,7 @@ using HospitalManagement.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog.Context;
 
 namespace HospitalManagement.Controllers;
 [Route("api/[controller]")]
@@ -27,18 +28,19 @@ public class PatientsController : ControllerBase
     [HttpPost("arrange-appointment")]
     public async Task<IActionResult> ArrangeAppointment([FromBody] ArrangeAppointmentDto requestDto)
     {
-        var time = TimeOnly.FromDateTime(requestDto.AppointmentDate);
-
-        if (!time.IsBetween(_doctorsSettings.WorkTime.Start, _doctorsSettings.WorkTime.End))
+        using (LogContext.PushProperty("PatientId", requestDto.PatientId))
         {
-            _logger.LogWarning("Doctor is not available at this time");
+            var time = TimeOnly.FromDateTime(requestDto.AppointmentDate);
 
-            return BadRequest("Doctor is not available at this time");
+            if (!time.IsBetween(_doctorsSettings.WorkTime.Start, _doctorsSettings.WorkTime.End))
+            {
+                _logger.LogWarning("Doctor is not available at this time");
+
+                return BadRequest("Doctor is not available at this time");
+            }
+
+            _logger.LogWarning("{@Request}, Patient with PassportSerial {PassportSerial}", requestDto, requestDto.PassportSerial);
         }
-
-        _logger.LogDebug($"Patient with PassportSerial:{requestDto.PassportSerial}");
-
-        _logger.LogInformation("Patient with PassportSerial {PassportSerial}", requestDto.PassportSerial);
 
         return Ok("Your appointment is arranged");
     }
