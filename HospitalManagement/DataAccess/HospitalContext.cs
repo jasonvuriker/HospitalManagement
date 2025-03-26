@@ -15,7 +15,8 @@ public class HospitalContext : DbContext
 
     public Speciality Specialities { get; set; }
 
-    public HospitalContext(DbContextOptions options) : base(options)
+
+    public HospitalContext(DbContextOptions<HospitalContext> options) : base(options)
     {
     }
 

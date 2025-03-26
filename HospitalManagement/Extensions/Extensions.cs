@@ -16,6 +16,11 @@ public static class Extensions
     {
         services.AddScoped<IDoctorRepository, DoctorRepository>();
         services.AddScoped<IDoctorService, DoctorService>();
+        services.AddScoped<IPatientRepository, PatientRepository>();
+        services.AddScoped<IPatientService, PatientService>();
+        services.AddScoped<INotificationService, NotificationService>();
+
+
         services.AddSingleton<PdpService>();
         services.AddTransient<CorrelationIdLoggingMiddleware>();
 

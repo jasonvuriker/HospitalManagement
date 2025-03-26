@@ -8,6 +8,8 @@ public class PatientBlank
 
     public bool IsActive { get; set; }
 
+    public int Severity { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public int PatientId { get; set; }

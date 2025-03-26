@@ -45,4 +45,11 @@ public class DoctorsController : ControllerBase
     {
         return Ok(await _pdpService.GetPdpData());
     }
+
+    [HttpPost("notify")]
+    public async Task<IActionResult> NotifyDoctors()
+    {
+        await _doctorService.SendPatientsStatus();
+        return Ok();
+    }
 }

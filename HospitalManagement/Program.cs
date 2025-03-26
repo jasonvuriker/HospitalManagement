@@ -16,6 +16,8 @@ builder.Services
     .AddConfigurations(configuration)
     .AddMonitoring(configuration);
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
