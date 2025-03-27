@@ -1,4 +1,6 @@
-﻿using HospitalManagement.DataAccess.Entities;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using HospitalManagement.DataAccess.Entities;
 using HospitalManagement.Dtos;
 using HospitalManagement.Enums;
 using HospitalManagement.Repository;
@@ -11,7 +13,11 @@ public interface IDoctorService
 {
     Task CreateDoctor(CreateDoctorDto doctorDto);
 
+    void UpdateDoctor(UpdateDoctorDto doctorDto);
+
     IList<DoctorDto> GetAllDoctors();
+
+    Task<DoctorDto> GetDoctor(int id);
 
     Task SendPatientsStatus();
 }
@@ -22,34 +28,56 @@ public class DoctorService : IDoctorService
     private readonly IDoctorRepository _doctorRepository;
     private readonly IPatientRepository _patientRepository;
     private readonly INotificationService _notificationService;
+    private readonly IMapper _mapper;
 
     public DoctorService(
-        IDoctorRepository doctorRepository, 
+        IDoctorRepository doctorRepository,
         IPatientRepository patientRepository,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IMapper mapper)
     {
         _doctorRepository = doctorRepository;
         _patientRepository = patientRepository;
         _notificationService = notificationService;
+        _mapper = mapper;
     }
 
     public async Task CreateDoctor(CreateDoctorDto doctorDto)
     {
-        var doctor = doctorDto.ToEntity();
+        var doctor = _mapper.Map<Doctor>(doctorDto);
 
         await _doctorRepository.AddAsync(doctor);
         await _doctorRepository.SaveChangesAsync();
     }
 
+    public void UpdateDoctor(UpdateDoctorDto doctorDto)
+    {
+        var doctor = _doctorRepository.GetById(doctorDto.Id);
+
+        _mapper.Map<UpdateDoctorDto, Doctor>(doctorDto, doctor);
+
+        _doctorRepository.Update(doctor);
+        _doctorRepository.SaveChanges();
+    }
+
     public IList<DoctorDto> GetAllDoctors()
     {
-        return _doctorRepository.GetAll().AsNoTracking().Select(r => new DoctorDto()
-        {
-            DoctorId = r.DoctorId,
-            Firstname = r.Firstname,
-            Lastname = r.Lastname,
-            SpecialtyId = r.SpecialityId
-        }).ToList();
+        var doctors = _doctorRepository
+            .GetAll()
+            .AsNoTracking()
+            .ProjectTo<DoctorDto>(_mapper.ConfigurationProvider)
+            .ToList();
+
+        return doctors;
+    }
+
+    public async Task<DoctorDto> GetDoctor(int id)
+    {
+        var doctor = await _doctorRepository.GetByIdAsync(id);
+
+        var doctorDto = _mapper.Map<DoctorDto>(doctor);
+
+        return doctorDto;
     }
 
     public async Task SendPatientsStatus()

@@ -16,7 +16,7 @@ public class DoctorsController : ControllerBase
     private readonly PdpService _pdpService;
 
     public DoctorsController(
-        IDoctorService doctorService, 
+        IDoctorService doctorService,
         IConfiguration configuration,
         PdpService pdpService)
     {
@@ -26,7 +26,7 @@ public class DoctorsController : ControllerBase
     }
 
     [LogActionFilter]
-    [HttpPost("create")]
+    [HttpPost]
     public async Task<IActionResult> CreateDoctor([FromBody] CreateDoctorDto doctorDto)
     {
         await _doctorService.CreateDoctor(doctorDto);
@@ -34,10 +34,16 @@ public class DoctorsController : ControllerBase
         return Created();
     }
 
-    [HttpGet("get-all")]
+    [HttpGet]
     public async Task<IActionResult> GetDoctors()
     {
         return Ok(_doctorService.GetAllDoctors());
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetDoctor([FromRoute] int id)
+    {
+        return Ok(await _doctorService.GetDoctor(id));
     }
 
     [HttpGet("pdp-data")]
