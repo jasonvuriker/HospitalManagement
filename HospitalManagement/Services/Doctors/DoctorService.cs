@@ -73,7 +73,7 @@ public class DoctorService : IDoctorService
 
     public async Task<DoctorDto> GetDoctor(int id)
     {
-        var doctor = await _doctorRepository.GetByIdAsync(id);
+        var doctor = await _doctorRepository.GetByIdCachedAsync(id);
 
         var doctorDto = _mapper.Map<DoctorDto>(doctor);
 

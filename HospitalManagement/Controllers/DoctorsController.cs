@@ -5,10 +5,12 @@ using HospitalManagement.Services;
 using HospitalManagement.Services.Doctors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace HospitalManagement.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+
 public class DoctorsController : ControllerBase
 {
     private readonly IDoctorService _doctorService;
@@ -35,12 +37,14 @@ public class DoctorsController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRateLimiting("tokenBucket")]
     public async Task<IActionResult> GetDoctors()
     {
         return Ok(_doctorService.GetAllDoctors());
     }
 
     [HttpGet("{id:int}")]
+    [EnableRateLimiting("sliding")]
     public async Task<IActionResult> GetDoctor([FromRoute] int id)
     {
         return Ok(await _doctorService.GetDoctor(id));
