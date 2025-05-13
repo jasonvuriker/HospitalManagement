@@ -60,6 +60,24 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", config =>
+        config
+            .WithOrigins("http://localhost:4201")
+            .WithMethods("POST")
+            .WithHeaders("x-api-key"));
+});
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("frontend1", config =>
+//        config
+//            .WithOrigins("http://localhost:4200")
+//            .AllowAnyHeader()
+//            .AllowAnyMethod());
+//});
+
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = "localhost";
@@ -78,10 +96,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("frontend");
+
 app.UseAuthorization();
 
 app.UseMiddleware<CorrelationIdLoggingMiddleware>();
-app.UseMiddleware<GlobalLoggingMiddleware>();
 app.UseMiddleware<ConfigurationValidationMiddleware>();
 
 app.UseRateLimiter();

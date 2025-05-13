@@ -3,6 +3,7 @@ using HospitalManagement.Dtos;
 using HospitalManagement.Filters;
 using HospitalManagement.Services;
 using HospitalManagement.Services.Doctors;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace HospitalManagement.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-
+[EnableCors("frontend")]
 public class DoctorsController : ControllerBase
 {
     private readonly IDoctorService _doctorService;
